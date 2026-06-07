@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Confirmación de Asistencia · Maya y Miguel</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Work+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --beige: #EEEDED;
+    --terra: #AA2204;
+    --terra-light: rgba(170,34,4,0.10);
+    --terra-mid: rgba(170,34,4,0.28);
+    --radius: 1px;
+  }
+ 
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+ 
+  body {
+    background: var(--beige);
+    color: var(--terra);
+    font-family: 'Work Sans', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+ 
+  /* ── WRAPPER ── */
+  .form-wrapper {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 0 0 80px;
+  }
+ 
+  /* ── HEADER ── */
+  .header {
+    width: 100%;
+    text-align: center;
+    padding: 56px 32px 40px;
+    margin-bottom: 40px;
+  }
+ 
+  .header-eyebrow {
+    font-family: 'Work Sans', sans-serif;
+    font-size: 9.5px;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    opacity: 0.55;
+    margin-bottom: 20px;
+  }
+ 
+  .header-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    font-size: clamp(48px, 13vw, 74px);
+    line-height: 1;
+    color: var(--terra);
+    letter-spacing: 0.04em;
+  }
+ 
+  .header-date {
+    font-family: 'Work Sans', sans-serif;
+    font-size: 9.5px;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    opacity: 0.55;
+    margin-top: 20px;
+  }
+ 
+  /* ── STEPS INDICATOR ── */
+  .steps-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    margin-bottom: 48px;
+    padding: 0 32px;
+  }
+ 
+  .step-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--terra-mid);
+    transition: all 0.35s ease;
+    flex-shrink: 0;
+  }
+ 
+  .step-dot.active {
+    background: var(--terra);
+    width: 20px;
+    border-radius: 3px;
+  }
+ 
+  .step-dot.done {
+    background: var(--terra);
+    opacity: 0.35;
+  }
+ 
+  /* ── SCREENS ── */
+  .screen {
+    display: none;
+    width: 100%;
+    max-width: 460px;
+    padding: 0 28px;
+    animation: fadeUp 0.4s ease both;
+  }
+ 
+  .screen.active { display: block; }
+ 
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+ 
+  /* ── SCREEN HEADER ── */
+  .screen-title {
+    font-family: 'Work Sans', sans-serif;
+    font-size: 9.5px;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    opacity: 0.5;
+    margin-bottom: 14px;
+    display: block;
+  }
+ 
+  .screen-heading {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    font-size: clamp(28px, 7.5vw, 36px);
+    line-height: 1.2;
+    margin-bottom: 36px;
+    color: var(--terra);
+    letter-spacing: 0.02em;
+  }
+ 
+  /* ── FIELD ── */
+  .field {
+    margin-bottom: 30px;
+  }
+ 
+  .field label {
+    display: block;
+    font-family: 'Work Sans', sans-serif;
+    font-size: 9.5px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    opacity: 0.65;
+  }
+ 
+  .field input,
+  .field textarea {
+    width: 100%;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--terra-mid);
+    color: var(--terra);
+    font-family: 'Work Sans', sans-serif;
+    font-weight: 300;
+    font-size: 16px;
+    padding: 8px 0 11px;
+    outline: none;
+    border-radius: 0;
+    transition: border-color 0.2s;
+    -webkit-appearance: none;
+  }
+ 
+  .field input:focus,
+  .field textarea:focus {
+    border-bottom-color: var(--terra);
+  }
+ 
+  .field input::placeholder,
+  .field textarea::placeholder {
+    color: var(--terra);
+    opacity: 0.25;
+    font-size: 14px;
+  }
+ 
+  .field textarea {
+    resize: none;
+    height: 72px;
+    line-height: 1.6;
+  }
+ 
+  /* ── RADIO / OPTION CARDS ── */
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    margin-bottom: 12px;
+  }
+ 
+  .options.two-col {
+    flex-direction: row;
+    gap: 10px;
+  }
+ 
+  .opt-label {
+    display: block;
+    cursor: pointer;
+    flex: 1;
+  }
+ 
+  .opt-label input[type="radio"] {
+    display: none;
+  }
+ 
+  .opt-card {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 14px 12px;
+    border: 1px solid var(--terra-mid);
+    font-family: 'Work Sans', sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    transition: all 0.2s ease;
+    cursor: pointer;
+  }
+ 
+  .opt-label input[type="radio"]:checked + .opt-card {
+    background: var(--terra);
+    color: var(--beige);
+    border-color: var(--terra);
+  }
+ 
+  /* list style (hotel) */
+  .options.list .opt-card {
+    justify-content: flex-start;
+    text-align: left;
+    padding: 13px 14px;
+    font-size: 10px;
+  }
+ 
+  .opt-card .check-icon {
+    display: none;
+    margin-left: auto;
+    font-style: normal;
+  }
+ 
+  .opt-label input[type="radio"]:checked + .opt-card .check-icon {
+    display: block;
+  }
+ 
+  /* ── CONDITIONAL REVEAL ── */
+  .reveal {
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 0.4s ease, opacity 0.3s ease;
+    opacity: 0;
+  }
+ 
+  .reveal.open {
+    max-height: 300px;
+    opacity: 1;
+  }
+ 
+  /* ── QUESTION LABEL ── */
+  .q-label {
+    font-family: 'Work Sans', sans-serif;
+    font-size: 9.5px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    opacity: 0.65;
+    display: block;
+    margin-bottom: 14px;
+  }
+ 
+  /* ── BUTTON ── */
+  .btn {
+    display: block;
+    width: 100%;
+    padding: 17px;
+    background: var(--terra);
+    color: var(--beige);
+    border: none;
+    font-family: 'Work Sans', sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+    cursor: pointer;
+    margin-top: 40px;
+    transition: opacity 0.2s;
+    -webkit-appearance: none;
+    border-radius: 0;
+  }
+ 
+  .btn:hover { opacity: 0.82; }
+  .btn:active { opacity: 0.68; }
+ 
+  /* loading spinner */
+  .spinner {
+    display: none;
+    width: 16px; height: 16px;
+    border: 1.5px solid rgba(238,237,237,0.5);
+    border-top-color: var(--beige);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    margin: 0 auto;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+ 
+  .btn.loading .btn-text { display: none; }
+  .btn.loading .spinner { display: block; }
+ 
+  /* ── ERROR ── */
+  .error-msg {
+    font-family: 'Work Sans', sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: var(--terra);
+    opacity: 0;
+    margin-top: 18px;
+    text-align: center;
+    transition: opacity 0.25s;
+    min-height: 15px;
+  }
+ 
+  .error-msg.show { opacity: 0.75; }
+ 
+  /* ── FINAL SCREENS ── */
+  .final-screen {
+    text-align: center;
+    padding: 20px 28px 0;
+    max-width: 460px;
+    margin: 0 auto;
+  }
+ 
+  .final-screen .final-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    font-size: clamp(36px, 10vw, 52px);
+    line-height: 1.15;
+    letter-spacing: 0.03em;
+    margin-bottom: 32px;
+  }
+ 
+  .final-screen .body-text {
+    font-family: 'Work Sans', sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    line-height: 2.2;
+    opacity: 0.65;
+  }
+ 
+  .final-date {
+    font-family: 'Work Sans', sans-serif;
+    font-size: 9px;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    opacity: 0.38;
+    margin-top: 44px;
+    text-align: center;
+  }
+ 
+  /* ── REVEAL subfield spacing ── */
+  .reveal .field {
+    margin-top: 20px;
+    margin-bottom: 4px;
+  }
+ 
+  /* ── BACK BUTTON ── */
+  .btn-back {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    background: transparent;
+    color: var(--terra);
+    border: 1px solid var(--terra-mid);
+    font-family: 'Work Sans', sans-serif;
+    font-size: 10px;
+    font-weight: 400;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: border-color 0.2s, opacity 0.2s;
+    -webkit-appearance: none;
+    border-radius: 0;
+  }
+ 
+  .btn-back:hover { border-color: var(--terra); opacity: 0.75; }
+  .btn-back:active { opacity: 0.55; }
+</style>
+</head>
+<body>
+ 
+<div class="form-wrapper">
+ 
+  <!-- HEADER -->
+  <div class="header">
+    <p class="header-eyebrow">Confirmación de asistencia</p>
+    <div class="header-title">Maya y Miguel</div>
+    <p class="header-date">20 de Marzo · 2027 · Acamilpa, Morelos</p>
+  </div>
+ 
+  <!-- PROGRESS DOTS -->
+  <div class="steps-bar" id="stepsBar">
+    <div class="step-dot active" data-step="0"></div>
+    <div class="step-dot" data-step="1"></div>
+    <div class="step-dot" data-step="2"></div>
+    <div class="step-dot" data-step="3"></div>
+    <div class="step-dot" data-step="4"></div>
+    <div class="step-dot" data-step="5"></div>
+  </div>
+ 
+  <!-- ══════════════════════════════════
+       SCREEN 0 — Datos personales
+  ══════════════════════════════════ -->
+  <div class="screen active" id="screen-0">
+    <span class="screen-title">Paso 1 de 6</span>
+    <h2 class="screen-heading">Cuéntanos quién eres</h2>
+ 
+    <div class="field">
+      <label for="nombre">Nombre *</label>
+      <input type="text" id="nombre" placeholder="Tu nombre" autocomplete="given-name">
+    </div>
+ 
+    <div class="field">
+      <label for="apellidos">Apellidos *</label>
+      <input type="text" id="apellidos" placeholder="Tus apellidos" autocomplete="family-name">
+    </div>
+ 
+    <div class="field">
+      <label for="telefono">Teléfono de contacto *</label>
+      <input type="tel" id="telefono" placeholder="+34 600 000 000" autocomplete="tel">
+    </div>
+ 
+    <p class="error-msg" id="err-0"></p>
+    <button class="btn" onclick="goNext(0)"><span class="btn-text">Continuar</span><div class="spinner"></div></button>
+  </div>
+ 
+  <!-- ══════════════════════════════════
+       SCREEN 1 — Asistencia
+  ══════════════════════════════════ -->
+  <div class="screen" id="screen-1">
+    <span class="screen-title">Paso 2 de 6</span>
+    <h2 class="screen-heading">¿Podrás asistir a nuestra boda?</h2>
+ 
+    <div class="options two-col">
+      <label class="opt-label">
+        <input type="radio" name="asistencia" value="Sí">
+        <div class="opt-card">Sí, allí estaré</div>
+      </label>
+      <label class="opt-label">
+        <input type="radio" name="asistencia" value="No">
+        <div class="opt-card">No podré ir</div>
+      </label>
+    </div>
+ 
+    <p class="error-msg" id="err-1"></p>
+    <button class="btn" onclick="goNext(1)"><span class="btn-text">Continuar</span><div class="spinner"></div></button>
+    <button class="btn-back" onclick="goBack(1)">Atrás</button>
+  </div>
+ 
+  <!-- ══════════════════════════════════
+       SCREEN 2 — Acompañante
+  ══════════════════════════════════ -->
+  <div class="screen" id="screen-2">
+    <span class="screen-title">Paso 3 de 6</span>
+    <h2 class="screen-heading">¿Vendrás acompañado?</h2>
+ 
+    <div class="options two-col">
+      <label class="opt-label">
+        <input type="radio" name="acompanante" value="Sí">
+        <div class="opt-card">Sí</div>
+      </label>
+      <label class="opt-label">
+        <input type="radio" name="acompanante" value="No">
+        <div class="opt-card">Vendré solo/a</div>
+      </label>
+    </div>
+ 
+    <div class="reveal" id="reveal-acomp">
+      <div class="field">
+        <label for="nombre-acomp">Nombre y apellidos del acompañante *</label>
+        <input type="text" id="nombre-acomp" placeholder="Nombre completo">
+      </div>
+    </div>
+ 
+    <p class="error-msg" id="err-2"></p>
+    <button class="btn" onclick="goNext(2)"><span class="btn-text">Continuar</span><div class="spinner"></div></button>
+    <button class="btn-back" onclick="goBack(2)">Atrás</button>
+  </div>
+ 
+  <!-- ══════════════════════════════════
+       SCREEN 3 — Restricciones alimentarias
+  ══════════════════════════════════ -->
+  <div class="screen" id="screen-3">
+    <span class="screen-title">Paso 4 de 6</span>
+    <h2 class="screen-heading" id="food-heading">¿Tienes alguna restricción alimenticia?</h2>
+ 
+    <div class="options two-col">
+      <label class="opt-label">
+        <input type="radio" name="restriccion" value="Sí">
+        <div class="opt-card">Sí</div>
+      </label>
+      <label class="opt-label">
+        <input type="radio" name="restriccion" value="No">
+        <div class="opt-card">No</div>
+      </label>
+    </div>
+ 
+    <div class="reveal" id="reveal-restriccion">
+      <div class="field">
+        <label for="det-restriccion">Por favor, indícala aquí:</label>
+        <input type="text" id="det-restriccion" placeholder="Gluten, lactosa, vegano…">
+      </div>
+    </div>
+ 
+    <p class="error-msg" id="err-3"></p>
+    <button class="btn" onclick="goNext(3)"><span class="btn-text">Continuar</span><div class="spinner"></div></button>
+    <button class="btn-back" onclick="goBack(3)">Atrás</button>
+  </div>
+ 
+  <!-- ══════════════════════════════════
+       SCREEN 4 — Preboda + Alojamiento
+  ══════════════════════════════════ -->
+  <div class="screen" id="screen-4">
+    <span class="screen-title">Paso 5 de 6</span>
+    <h2 class="screen-heading">Detalles logísticos</h2>
+ 
+    <span class="q-label">¿Vas a asistir a la preboda el viernes 19? *</span>
+    <div class="options two-col" style="margin-bottom: 36px;">
+      <label class="opt-label">
+        <input type="radio" name="preboda" value="Sí">
+        <div class="opt-card">Sí</div>
+      </label>
+      <label class="opt-label">
+        <input type="radio" name="preboda" value="No">
+        <div class="opt-card">No</div>
+      </label>
+    </div>
+ 
+    <span class="q-label">¿Dónde te alojas? *</span>
+    <div class="options list">
+      <label class="opt-label">
+        <input type="radio" name="hotel" value="Hotel Fiesta Americana">
+        <div class="opt-card">Hotel Fiesta Americana <span class="check-icon">✓</span></div>
+      </label>
+      <label class="opt-label">
+        <input type="radio" name="hotel" value="Hotel Radisson">
+        <div class="opt-card">Hotel Radisson <span class="check-icon">✓</span></div>
+      </label>
+      <label class="opt-label">
+        <input type="radio" name="hotel" value="Hotel El Laurel">
+        <div class="opt-card">Hotel El Laurel <span class="check-icon">✓</span></div>
+      </label>
+      <label class="opt-label">
+        <input type="radio" name="hotel" value="Otro">
+        <div class="opt-card">Otro <span class="check-icon">✓</span></div>
+      </label>
+      <label class="opt-label">
+        <input type="radio" name="hotel" value="Aún no lo sé">
+        <div class="opt-card">Aún no lo sé <span class="check-icon">✓</span></div>
+      </label>
+    </div>
+ 
+    <div class="reveal" id="reveal-hotel">
+      <div class="field">
+        <label for="otro-hotel">Nombre del hotel, si es posible:</label>
+        <input type="text" id="otro-hotel" placeholder="Nombre del hotel">
+      </div>
+    </div>
+ 
+    <p class="error-msg" id="err-4"></p>
+    <button class="btn" onclick="goNext(4)"><span class="btn-text">Continuar</span><div class="spinner"></div></button>
+    <button class="btn-back" onclick="goBack(4)">Atrás</button>
+  </div>
+ 
+  <!-- ══════════════════════════════════
+       SCREEN 5 — Música + Comentarios
+  ══════════════════════════════════ -->
+  <div class="screen" id="screen-5">
+    <span class="screen-title">Paso 6 de 6</span>
+    <h2 class="screen-heading">Un último detalle</h2>
+ 
+    <div class="field">
+      <label for="cancion">¿Qué canción no puede faltar en nuestra boda?</label>
+      <input type="text" id="cancion" placeholder="Artista · Título">
+    </div>
+ 
+    <div class="field">
+      <label for="comentario">¿Tienes algún comentario o sugerencia?</label>
+      <textarea id="comentario" placeholder="Escríbenos lo que quieras…"></textarea>
+    </div>
+ 
+    <p class="error-msg" id="err-5"></p>
+    <button class="btn" onclick="submitForm()"><span class="btn-text">Enviar confirmación</span><div class="spinner"></div></button>
+    <button class="btn-back" onclick="goBack(5)">Atrás</button>
+  </div>
+ 
+  <!-- ══════════════════════════════════
+       SCREEN FINAL — Gracias (asiste)
+  ══════════════════════════════════ -->
+  <div class="screen" id="screen-thanks">
+    <div class="final-screen">
+      <h2 class="final-title">Muchas gracias.</h2>
+      <p class="body-text">Tus respuestas han sido<br>registradas correctamente.</p>
+      <p class="final-date">20 · 03 · 2027 · Acamilpa, Morelos</p>
+    </div>
+  </div>
+ 
+  <!-- ══════════════════════════════════
+       SCREEN FINAL — No asiste
+  ══════════════════════════════════ -->
+  <div class="screen" id="screen-nope">
+    <div class="final-screen">
+      <h2 class="final-title">Muchas gracias.</h2>
+      <p class="body-text">Tus respuestas han sido<br>registradas correctamente.</p>
+      <p class="final-date">20 · 03 · 2027 · Acamilpa, Morelos</p>
+    </div>
+  </div>
+ 
+</div>
+ 
+<script>
+let currentScreen = 0;
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyqh3kERljyk8ZbyGsOUrny9SrekWmo3KkPLm464ZedkOfXLiY8Z77SToT9YwPTpaYF/exec';
+ 
+document.querySelectorAll('input[name="acompanante"]').forEach(r => {
+  r.addEventListener('change', () => {
+    toggleReveal('reveal-acomp', r.value === 'Sí');
+    updateFoodHeading(r.value === 'Sí');
+  });
+});
+ 
+document.querySelectorAll('input[name="restriccion"]').forEach(r => {
+  r.addEventListener('change', () => {
+    toggleReveal('reveal-restriccion', r.value === 'Sí');
+  });
+});
+ 
+document.querySelectorAll('input[name="hotel"]').forEach(r => {
+  r.addEventListener('change', () => {
+    toggleReveal('reveal-hotel', r.value === 'Otro');
+  });
+});
+ 
+function toggleReveal(id, open) {
+  const el = document.getElementById(id);
+  open ? el.classList.add('open') : el.classList.remove('open');
+}
+ 
+function updateFoodHeading(hasPartner) {
+  document.getElementById('food-heading').textContent = hasPartner
+    ? '¿Tú o tu acompañante tenéis alguna restricción alimenticia?'
+    : '¿Tienes alguna restricción alimenticia que debamos tener en cuenta?';
+}
+ 
+function validate(idx) {
+  document.getElementById('err-' + idx).classList.remove('show');
+ 
+  if (idx === 0) {
+    const ok = ['nombre','apellidos','telefono'].every(id => document.getElementById(id).value.trim());
+    if (!ok) { showError(0, 'Por favor, completa todos los campos.'); return false; }
+    return true;
+  }
+  if (idx === 1) {
+    if (!document.querySelector('input[name="asistencia"]:checked')) { showError(1, 'Por favor, selecciona una opción.'); return false; }
+    return true;
+  }
+  if (idx === 2) {
+    const sel = document.querySelector('input[name="acompanante"]:checked');
+    if (!sel) { showError(2, 'Por favor, selecciona una opción.'); return false; }
+    if (sel.value === 'Sí' && !document.getElementById('nombre-acomp').value.trim()) {
+      showError(2, 'Por favor, indica el nombre de tu acompañante.'); return false;
+    }
+    return true;
+  }
+  if (idx === 3) {
+    if (!document.querySelector('input[name="restriccion"]:checked')) { showError(3, 'Por favor, selecciona una opción.'); return false; }
+    return true;
+  }
+  if (idx === 4) {
+    if (!document.querySelector('input[name="preboda"]:checked')) { showError(4, 'Indica si asistirás a la preboda.'); return false; }
+    if (!document.querySelector('input[name="hotel"]:checked')) { showError(4, 'Por favor, selecciona tu alojamiento.'); return false; }
+    return true;
+  }
+  return true;
+}
+ 
+function showError(idx, msg) {
+  const el = document.getElementById('err-' + idx);
+  el.textContent = msg;
+  el.classList.add('show');
+}
+ 
+function goNext(from) {
+  if (!validate(from)) return;
+  if (from === 1 && document.querySelector('input[name="asistencia"]:checked').value === 'No') {
+    submitNoAttend(); return;
+  }
+  showScreen(from + 1);
+}
+ 
+function goBack(from) {
+  // From screen 2 (acompañante), going back to screen 1 (asistencia)
+  // From screen 3 (restricciones), going back to screen 2 (acompañante)
+  // etc. — always one step back
+  showScreen(from - 1);
+}
+ 
+function showScreen(idx) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + idx).classList.add('active');
+  currentScreen = idx;
+  updateDots(idx);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+ 
+function showFinalScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.getElementById('stepsBar').style.display = 'none';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+ 
+function updateDots(active) {
+  document.querySelectorAll('.step-dot').forEach((d, i) => {
+    d.classList.remove('active','done');
+    if (i < active) d.classList.add('done');
+    else if (i === active) d.classList.add('active');
+  });
+}
+ 
+function collectData() {
+  return {
+    nombre:          document.getElementById('nombre').value.trim(),
+    apellidos:       document.getElementById('apellidos').value.trim(),
+    telefono:        document.getElementById('telefono').value.trim(),
+    asistencia:      document.querySelector('input[name="asistencia"]:checked')?.value || '',
+    acompanante:     document.querySelector('input[name="acompanante"]:checked')?.value || '',
+    nombre_acomp:    document.getElementById('nombre-acomp').value.trim(),
+    restriccion:     document.querySelector('input[name="restriccion"]:checked')?.value || '',
+    det_restriccion: document.getElementById('det-restriccion').value.trim(),
+    preboda:         document.querySelector('input[name="preboda"]:checked')?.value || '',
+    hotel:           document.querySelector('input[name="hotel"]:checked')?.value || '',
+    otro_hotel:      document.getElementById('otro-hotel').value.trim(),
+    cancion:         document.getElementById('cancion').value.trim(),
+    comentario:      document.getElementById('comentario').value.trim(),
+    timestamp:       new Date().toISOString()
+  };
+}
+ 
+async function submitForm() {
+  if (!validate(5)) return;
+  const btn = document.querySelector('#screen-5 .btn');
+  btn.classList.add('loading');
+  try {
+    await fetch(APPS_SCRIPT_URL, { method:'POST', mode:'no-cors', headers:{'Content-Type':'application/json'}, body: JSON.stringify(collectData()) });
+  } catch(e) {}
+  btn.classList.remove('loading');
+  showFinalScreen('screen-thanks');
+}
+ 
+async function submitNoAttend() {
+  const data = collectData();
+  data.asistencia = 'No';
+  try {
+    await fetch(APPS_SCRIPT_URL, { method:'POST', mode:'no-cors', headers:{'Content-Type':'application/json'}, body: JSON.stringify(data) });
+  } catch(e) {}
+  showFinalScreen('screen-nope');
+}
+</script>
+</body>
+</html>
+ 
